@@ -8,7 +8,9 @@ export const metadata = {
 };
 
 export default function CreatePage() {
-  const stripePaymentLink = process.env.STRIPE_PAYMENT_LINK || "";
+  const stripePaymentLink =
+    process.env.STRIPE_PAYMENT_LINK ||
+    "https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K";
   const devBypass = process.env.LIVEPROOF_DEV_BYPASS === "1";
 
   return (
