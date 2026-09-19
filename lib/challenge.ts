@@ -47,3 +47,15 @@ export const DEMO_STAMP = {
   videoUrl: null as string | null,
   mimeType: null as string | null,
 };
+
+/** Sanitize requester-supplied challenge text into 3–8 word tokens (max ~80 chars). */
+export function sanitizeManualWords(raw: string): string[] {
+  const cleaned = String(raw || "")
+    .replace(/[\u0000-\u001F\u007F]/g, "")
+    .replace(/[^a-zA-Z0-9\s'-]/g, " ")
+    .trim()
+    .slice(0, 80);
+  const parts = cleaned.split(/\s+/).filter(Boolean);
+  if (parts.length < 3) return [];
+  return parts.slice(0, 8).map((w) => w.slice(0, 24));
+}

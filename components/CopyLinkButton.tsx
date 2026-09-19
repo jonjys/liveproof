@@ -2,17 +2,22 @@
 
 import { useState } from "react";
 
-export function CopyLinkButton() {
+type Props = {
+  /** Defaults to current page URL */
+  url?: string;
+};
+
+export function CopyLinkButton({ url }: Props) {
   const [copied, setCopied] = useState(false);
 
   async function copy() {
-    const url = window.location.href;
+    const value = url || window.location.href;
     try {
-      await navigator.clipboard.writeText(url);
+      await navigator.clipboard.writeText(value);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      window.prompt("Copy this link:", url);
+      window.prompt("Copy this link:", value);
     }
   }
 
