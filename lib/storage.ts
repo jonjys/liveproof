@@ -64,6 +64,99 @@ async function ensureDir(dir: string) {
   await fs.mkdir(dir, { recursive: true });
 }
 
+async function putBlobJson(pathname: string, data: unknown): Promise<void> {
+  const { put } = await import("@vercel/blob");
+  await put(pathname, JSON.stringify(data, null, 2), {
+    access: "public",
+    contentType: "application/json",
+    addRandomSuffix: false,
+  });
+}
+
+async function fetchBlobJson<T>(url: string): Promise<T | null> {
+  try {
+    const res = await fetch(url, { cache: "no-store" });
+    if (!res.ok) return null;
+    return (await res.json()) as T;
+  } catch (err) {
+    console.error("Blob JSON fetch failed:", err);
+    return null;
+  }
+}
+
+/**
+ * Load stamp meta (+ video URL if present) from Vercel Blob.
+ * Soft-fails: if meta.json is missing but video.webm exists, returns a minimal stamp.
+ */
+async function getStampFromBlob(id: string): Promise<StampRecord | null> {
+  if (!hasBlobToken()) return null;
+  try {
+    const { list } = await import("@vercel/blob");
+    const { blobs } = await list({ prefix: `stamps/${id}/` });
+    if (!blobs.length) return null;
+
+    const metaBlob = blobs.find((b) => b.pathname.endsWith("/meta.json"));
+    const videoBlob = blobs.find((b) =>
+      b.pathname.endsWith("/video.webm")
+    );
+
+    if (metaBlob) {
+      const meta = await fetchBlobJson<StampMeta>(metaBlob.url);
+      if (meta && meta.id) {
+        const record: StampRecord = {
+          ...meta,
+          hasVideo: !!(meta.hasVideo || meta.videoUrl || videoBlob),
+          videoUrl: meta.videoUrl || videoBlob?.url || null,
+          mimeType: meta.mimeType || "video/webm",
+        };
+        memoryStore().set(id, record);
+        return record;
+      }
+    }
+
+    // Soft-fail: video exists without meta
+    if (videoBlob) {
+      const record: StampRecord = {
+        id,
+        words: [],
+        code: "LIVE-????",
+        createdAt: videoBlob.uploadedAt?.toISOString?.() || new Date().toISOString(),
+        hasVideo: true,
+        videoUrl: videoBlob.url,
+        mimeType: "video/webm",
+      };
+      memoryStore().set(id, record);
+      return record;
+    }
+
+    return null;
+  } catch (err) {
+    console.error("Blob getStamp failed:", err);
+    return null;
+  }
+}
+
+async function getInviteFromBlob(token: string): Promise<InviteMeta | null> {
+  if (!hasBlobToken()) return null;
+  try {
+    const { list } = await import("@vercel/blob");
+    const pathname = `invites/${token}.json`;
+    const { blobs } = await list({ prefix: pathname });
+    const match =
+      blobs.find((b) => b.pathname === pathname) ||
+      blobs.find((b) => b.pathname.endsWith(`/${token}.json`)) ||
+      blobs[0];
+    if (!match) return null;
+    const invite = await fetchBlobJson<InviteMeta>(match.url);
+    if (!invite || !invite.token) return null;
+    inviteStore().set(token, invite);
+    return invite;
+  } catch (err) {
+    console.error("Blob getInvite failed:", err);
+    return null;
+  }
+}
+
 export async function saveStamp(
   meta: StampMeta,
   video: Buffer,
@@ -76,7 +169,7 @@ export async function saveStamp(
     videoBuffer: video,
   };
 
-  // Optional durable Blob upload
+  // Optional durable Blob upload (video + meta so any instance can read)
   if (hasBlobToken()) {
     try {
       const { put } = await import("@vercel/blob");
@@ -88,7 +181,7 @@ export async function saveStamp(
       record.videoUrl = blob.url;
       record.videoBuffer = undefined; // prefer Blob URL; keep disk/memory as backup
     } catch (err) {
-      console.error("Blob upload failed, falling back to disk/memory:", err);
+      console.error("Blob video upload failed, falling back to disk/memory:", err);
     }
   }
 
@@ -106,6 +199,7 @@ export async function saveStamp(
     hasVideo: true,
     videoUrl: record.videoUrl ?? null,
     mimeType: record.mimeType ?? mimeType,
+    note: record.note,
   };
   await fs.writeFile(
     path.join(dir, "meta.json"),
@@ -113,6 +207,14 @@ export async function saveStamp(
     "utf8"
   );
   await fs.writeFile(path.join(dir, "video.webm"), video);
+
+  if (hasBlobToken()) {
+    try {
+      await putBlobJson(`stamps/${meta.id}/meta.json`, metaOut);
+    } catch (err) {
+      console.error("Blob meta upload failed:", err);
+    }
+  }
 
   return metaOut;
 }
@@ -135,11 +237,16 @@ export async function getStamp(id: string): Promise<StampRecord | null> {
     } catch {
       videoBuffer = undefined;
     }
-    const record: StampRecord = { ...meta, videoBuffer };
+    const record: StampRecord = {
+      ...meta,
+      hasVideo: !!(meta.hasVideo || meta.videoUrl || videoBuffer),
+      videoBuffer,
+    };
     memoryStore().set(id, record);
     return record;
   } catch {
-    return null;
+    // Disk miss — try durable Blob (cross-instance on Vercel)
+    return getStampFromBlob(id);
   }
 }
 
@@ -160,6 +267,7 @@ export async function getVideo(
     const buf = await fs.readFile(path.join(stampsDir(), id, "video.webm"));
     return { buffer: buf, mimeType: stamp.mimeType || "video/webm" };
   } catch {
+    // Prefer redirecting clients to videoUrl; no buffer available remotely
     return null;
   }
 }
@@ -192,6 +300,15 @@ export async function saveInvite(invite: InviteMeta): Promise<InviteMeta> {
     JSON.stringify(invite, null, 2),
     "utf8"
   );
+
+  if (hasBlobToken()) {
+    try {
+      await putBlobJson(`invites/${invite.token}.json`, invite);
+    } catch (err) {
+      console.error("Blob invite upload failed:", err);
+    }
+  }
+
   return invite;
 }
 
@@ -206,7 +323,7 @@ export async function getInvite(token: string): Promise<InviteMeta | null> {
     inviteStore().set(clean, invite);
     return invite;
   } catch {
-    return null;
+    return getInviteFromBlob(clean);
   }
 }
 

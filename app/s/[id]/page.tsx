@@ -2,6 +2,9 @@ import { notFound } from "next/navigation";
 import { StampView } from "@/components/StampView";
 import { getStamp } from "@/lib/storage";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 type Props = { params: Promise<{ id: string }> };
 
 export async function generateMetadata({ params }: Props) {

@@ -6,6 +6,9 @@ import { CreateClient } from "@/components/CreateClient";
 import { StampView } from "@/components/StampView";
 import { getInvite, getStamp } from "@/lib/storage";
 
+export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+
 type Props = { params: Promise<{ token: string }> };
 
 export async function generateMetadata({ params }: Props) {
