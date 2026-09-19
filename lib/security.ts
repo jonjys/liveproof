@@ -1,7 +1,7 @@
 import { timingSafeEqual } from "crypto";
 
 export const DEFAULT_PAYMENT_LINK =
-  "https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K";
+  "https://buy.stripe.com/4gM5kCeCt1gy6ms9j78og0P";
 
 export const SITE_ORIGIN = "https://liveproof.nyttolabs.com";
 
