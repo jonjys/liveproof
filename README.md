@@ -48,19 +48,21 @@ Open http://localhost:3000
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `LIVEPROOF_DEV_BYPASS` | No | Set to `1` to skip payment gate (preview / local) |
-| `STRIPE_PAYMENT_LINK` | No | Stripe Payment Link URL shown on `/create` |
+| `LIVEPROOF_DEV_BYPASS` | No | Set to `1` to skip payment gate (**local / preview only** — do not set in production) |
+| `STRIPE_PAYMENT_LINK` | No | Stripe Payment Link URL on `/create`. Example (live, 99 SEK): `https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K`. Code falls back to this link if unset. |
 | `BLOB_READ_WRITE_TOKEN` | Prod recommended | Vercel Blob RW token for durable videos |
 
 Copy from `.env.example`.
+
+After Stripe Payment Link checkout, customers redirect to `https://liveproof-sigma.vercel.app/create?paid=1`, which unlocks submit on `/create`.
 
 ## Deploy on Vercel
 
 1. Import this folder as a Next.js project (or connect the repo root that contains `liveproof-web` and set Root Directory to `liveproof-web`).
 2. Set env vars in the Vercel project:
-   - `LIVEPROOF_DEV_BYPASS=1` for preview demos without Stripe
-   - `STRIPE_PAYMENT_LINK` when you go live on payments
+   - `STRIPE_PAYMENT_LINK=https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K` (optional — app already defaults to this live link)
    - `BLOB_READ_WRITE_TOKEN` for durable video storage (**strongly recommended in production**)
+   - Do **not** set `LIVEPROOF_DEV_BYPASS` in production. Use it only for local/preview demos without Stripe.
 3. Deploy.
 
 ### Storage notes on Vercel
