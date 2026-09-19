@@ -95,6 +95,17 @@ export function CreateClient({ stripePaymentLink, devBypass }: Props) {
     };
   }, [refreshChallenge]);
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const paidParam = params.get("paid");
+    if (paidParam === "1" || paidParam === "true") {
+      setPaid(true);
+      setStatus("Payment received. You can record and submit your stamp.");
+      setStatusKind("ok");
+    }
+  }, []);
+
   function setMsg(msg: string, kind: "" | "ok" | "err" = "") {
     setStatus(msg);
     setStatusKind(kind);
@@ -329,9 +340,6 @@ export function CreateClient({ stripePaymentLink, devBypass }: Props) {
         {stripePaymentLink ? (
           <a
             href={stripePaymentLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => setPaid(true)}
             className="inline-flex items-center rounded-full border border-lp-cyan/20 px-4 py-2.5 text-sm font-semibold text-lp-text hover:border-lp-cyan hover:text-lp-cyan"
           >
             Pay with Stripe
