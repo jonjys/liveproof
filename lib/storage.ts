@@ -16,6 +16,18 @@ export type StampMeta = {
   mimeType?: string | null;
 };
 
+export type InviteMeta = {
+  token: string;
+  note?: string;
+  createdAt: string;
+  /** Stamp id once the recipient completed the challenge */
+  stampId?: string | null;
+  /** auto = recipient gets random words; manual = requester-supplied words */
+  wordsMode?: "auto" | "manual";
+  /** Challenge words when wordsMode is manual (3–8 tokens / short phrase) */
+  words?: string[];
+};
+
 type StampRecord = StampMeta & {
   videoBuffer?: Buffer;
 };
@@ -150,4 +162,60 @@ export async function getVideo(
   } catch {
     return null;
   }
+}
+
+declare global {
+  // eslint-disable-next-line no-var
+  var __liveproofInvites: Map<string, InviteMeta> | undefined;
+}
+
+function inviteStore(): Map<string, InviteMeta> {
+  if (!globalThis.__liveproofInvites) {
+    globalThis.__liveproofInvites = new Map();
+  }
+  return globalThis.__liveproofInvites;
+}
+
+export function invitesDir(): string {
+  if (isVercel()) {
+    return path.join("/tmp", "invites");
+  }
+  return path.join(process.cwd(), "data", "invites");
+}
+
+export async function saveInvite(invite: InviteMeta): Promise<InviteMeta> {
+  inviteStore().set(invite.token, invite);
+  const dir = invitesDir();
+  await ensureDir(dir);
+  await fs.writeFile(
+    path.join(dir, `${invite.token}.json`),
+    JSON.stringify(invite, null, 2),
+    "utf8"
+  );
+  return invite;
+}
+
+export async function getInvite(token: string): Promise<InviteMeta | null> {
+  const clean = String(token || "").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+  if (!clean) return null;
+  const mem = inviteStore().get(clean);
+  if (mem) return mem;
+  try {
+    const raw = await fs.readFile(path.join(invitesDir(), `${clean}.json`), "utf8");
+    const invite = JSON.parse(raw) as InviteMeta;
+    inviteStore().set(clean, invite);
+    return invite;
+  } catch {
+    return null;
+  }
+}
+
+export async function bindInviteStamp(
+  token: string,
+  stampId: string
+): Promise<InviteMeta | null> {
+  const invite = await getInvite(token);
+  if (!invite) return null;
+  const next: InviteMeta = { ...invite, stampId };
+  return saveInvite(next);
 }
