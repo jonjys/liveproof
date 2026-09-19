@@ -186,7 +186,7 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
 
       {!paid ? (
         <div className="mt-6 rounded-2xl border border-lp-cyan/20 bg-gradient-to-b from-lp-card/95 to-lp-bg2/95 p-5 text-center shadow-card">
-          <div className="mb-2 text-xl font-bold">$9 / 99 kr</div>
+          <div className="mb-2 text-xl font-bold">$5 / 49 kr</div>
           <p className="mb-4 text-sm text-lp-muted">
             You pay once. They open the link, record the challenge, and you both
             see the stamp on the same URL.
