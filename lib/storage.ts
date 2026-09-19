@@ -6,6 +6,8 @@ export type StampMeta = {
   id: string;
   words: string[];
   code: string;
+  /** Finger count shown in the presence challenge (1–5). */
+  fingers?: number;
   createdAt: string;
   hasVideo: boolean;
   note?: string;
@@ -87,6 +89,7 @@ export async function saveStamp(
     id: record.id,
     words: record.words,
     code: record.code,
+    fingers: record.fingers,
     createdAt: record.createdAt,
     hasVideo: true,
     videoUrl: record.videoUrl ?? null,

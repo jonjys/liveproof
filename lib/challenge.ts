@@ -31,10 +31,16 @@ export function randomId(): string {
   );
 }
 
+/** Random finger count for presence challenge (1–5). */
+export function pickFingers(): number {
+  return 1 + Math.floor(Math.random() * 5);
+}
+
 export const DEMO_STAMP = {
   id: "demo",
   words: ["orchid", "velvet", "cascade", "lantern", "whisper", "ember"],
   code: "LIVE-DEMO",
+  fingers: 3,
   createdAt: "2026-09-18T12:00:00.000Z",
   hasVideo: false,
   note: "record your own",
