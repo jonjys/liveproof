@@ -32,8 +32,8 @@ export default function HomePage() {
               Get your own stamp
             </Link>
             <span className="inline-flex items-center gap-2 rounded-full border border-lp-cyan/20 bg-lp-card/70 px-3.5 py-1.5 text-sm text-lp-muted">
-              <strong className="text-lp-text">$9</strong> /{" "}
-              <strong className="text-lp-text">99 kr</strong>
+              <strong className="text-lp-text">$5</strong> /{" "}
+              <strong className="text-lp-text">49 kr</strong>
             </span>
           </div>
         </section>
@@ -115,7 +115,7 @@ export default function HomePage() {
               href="/create"
               className="inline-flex items-center rounded-full border border-lp-cyan/20 px-5 py-2.5 font-semibold text-lp-text hover:border-lp-cyan hover:text-lp-cyan"
             >
-              Get your own stamp · $9 / 99 kr
+              Get your own stamp · $5 / 49 kr
             </Link>
             <Link
               href="/s/demo"

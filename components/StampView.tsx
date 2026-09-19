@@ -106,7 +106,7 @@ export function StampView({ stamp, videoSrc }: Props) {
               href="/create"
               className="inline-flex items-center rounded-full border border-lp-cyan/20 px-4 py-2.5 text-sm font-semibold text-lp-text hover:border-lp-cyan hover:text-lp-cyan"
             >
-              Make your own · $9 / 99 kr
+              Make your own · $5 / 49 kr
             </Link>
           </div>
         </section>

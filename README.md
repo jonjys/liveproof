@@ -63,7 +63,7 @@ Never commit secret values. Set them in Vercel → Project → Settings → Envi
 |----------|------------------|-------------|
 | `STRIPE_SECRET_KEY` | **Yes** | Stripe secret (`sk_live_…` / `sk_test_…`). Used to retrieve Checkout Sessions and consume them (metadata). |
 | `STRIPE_WEBHOOK_SECRET` | **Yes** | Webhook signing secret (`whsec_…`) for `POST /api/stripe/webhook`. |
-| `STRIPE_PAYMENT_LINK` | No | Defaults to `https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K`. Keep this live Payment Link. |
+| `STRIPE_PAYMENT_LINK` | No | Defaults to `https://buy.stripe.com/4gM5kCeCt1gy6ms9j78og0P`. Keep this live Payment Link. |
 | `BLOB_READ_WRITE_TOKEN` | Strongly recommended | Vercel Blob RW token (auto-set when a Blob store is connected). |
 | `BLOB_STORE_ID` | No | Set when using Vercel OIDC instead of the static token. |
 | `BLOB_ACCESS` | No | `private` (preferred) or `public`. App tries private first, then public if the store is public-only. |
@@ -78,7 +78,7 @@ Copy from `.env.example`.
 2. **Set env vars** (Production):
    - `STRIPE_SECRET_KEY`
    - `STRIPE_WEBHOOK_SECRET`
-   - `STRIPE_PAYMENT_LINK=https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K` (optional; already the code default)
+   - `STRIPE_PAYMENT_LINK=https://buy.stripe.com/4gM5kCeCt1gy6ms9j78og0P` (optional; already the code default)
    - `BLOB_READ_WRITE_TOKEN` (or connect a Blob store)
    - Do **not** set `LIVEPROOF_DEV_BYPASS` in production
 3. **Stripe Dashboard → Payment Links** → this link → After payment:
@@ -102,7 +102,7 @@ Until `STRIPE_SECRET_KEY` is set, paid customers also cannot create (fail-closed
 
 ## Price
 
-**$9 / 99 kr** per stamp or invite (Stripe Payment Link). One Checkout Session unlocks one create.
+**$5 / 49 kr** per stamp or invite (Stripe Payment Link). One Checkout Session unlocks one create.
 
 ## Delete unpaid audit leftovers
 
