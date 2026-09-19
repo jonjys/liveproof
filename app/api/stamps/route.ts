@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
+  bindInviteStamp,
   hasBlobToken,
   isVercel,
   saveStamp,
@@ -40,7 +41,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let parsed: { id?: string; words?: string[]; code?: string; fingers?: number } = {};
+    let parsed: { id?: string; words?: string[]; code?: string; fingers?: number; inviteToken?: string } = {};
     if (typeof metaField === "string") {
       parsed = JSON.parse(metaField);
     } else if (metaField instanceof Blob) {
@@ -87,10 +88,18 @@ export async function POST(req: NextRequest) {
 
     const saved = await saveStamp(meta, buffer, mimeType);
 
+    const inviteToken =
+      parsed.inviteToken &&
+      String(parsed.inviteToken).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
+    if (inviteToken) {
+      await bindInviteStamp(inviteToken, saved.id);
+    }
+
     return NextResponse.json({
       ok: true,
       id: saved.id,
-      url: `/s/${saved.id}`,
+      url: inviteToken ? `/p/${inviteToken}` : `/s/${saved.id}`,
+      inviteToken: inviteToken || undefined,
       ephemeral: isVercel() && !hasBlobToken(),
       message:
         isVercel() && !hasBlobToken()
