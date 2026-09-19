@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getInvite, getStamp } from "@/lib/storage";
+import { getInvite, getStamp, toClientStamp } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -14,13 +14,14 @@ export async function GET(_req: NextRequest, ctx: Ctx) {
   }
   let stamp = null;
   if (invite.stampId) {
-    stamp = await getStamp(invite.stampId);
-    if (stamp) {
-      const { videoBuffer: _, ...meta } = stamp as typeof stamp & {
-        videoBuffer?: Buffer;
-      };
-      stamp = meta;
+    const full = await getStamp(invite.stampId);
+    if (full) {
+      const { videoBuffer: _, ...meta } = full;
+      stamp = toClientStamp(meta);
     }
   }
-  return NextResponse.json({ ok: true, invite, stamp });
+  return NextResponse.json(
+    { ok: true, invite, stamp },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }

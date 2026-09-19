@@ -1,25 +1,34 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sanitizeManualWords } from "@/lib/challenge";
+import { consumeCheckoutSession, consumeErrorResponse } from "@/lib/entitlements";
+import { newInviteToken } from "@/lib/ids";
+import {
+  clientIpFromHeaders,
+  rateLimit,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
 import { saveInvite, type InviteMeta } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-function randomToken() {
-  return (
-    Math.random().toString(36).slice(2, 10) +
-    Date.now().toString(36).slice(-6)
-  );
-}
-
 export async function POST(req: NextRequest) {
   try {
+    const ip = clientIpFromHeaders(req.headers);
+    const limited = rateLimit(`invites:${ip}`, 8, 10 * 60 * 1000);
+    if (!limited.ok) {
+      const r = rateLimitResponse(limited.retryAfterSec);
+      return NextResponse.json(r.body, { status: r.status, headers: r.headers });
+    }
+
     let note = "";
     let wordsMode: "auto" | "manual" = "auto";
     let words: string[] | undefined;
+    let sessionId: unknown;
     try {
       const body = await req.json();
       note = String(body?.note || "").slice(0, 280);
+      sessionId = body?.sessionId || body?.session_id;
       const mode = String(body?.wordsMode || "auto").toLowerCase();
       wordsMode = mode === "manual" ? "manual" : "auto";
       if (wordsMode === "manual") {
@@ -42,7 +51,13 @@ export async function POST(req: NextRequest) {
       wordsMode = "auto";
     }
 
-    const token = randomToken();
+    const paid = await consumeCheckoutSession(sessionId, "invite", "pending-invite");
+    if (!paid.ok) {
+      const r = consumeErrorResponse(paid);
+      return NextResponse.json(r.body, { status: r.status });
+    }
+
+    const token = newInviteToken();
     const invite: InviteMeta = {
       token,
       note: note || undefined,

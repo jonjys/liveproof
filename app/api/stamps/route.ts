@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
+import { consumeCheckoutSession, consumeErrorResponse } from "@/lib/entitlements";
 import {
+  clientIpFromHeaders,
+  rateLimit,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import { sanitizeInviteToken } from "@/lib/ids";
+import {
+  allocateStampId,
   bindInviteStamp,
+  getInvite,
   hasBlobToken,
   isVercel,
   saveStamp,
@@ -14,10 +23,14 @@ const MAX_BYTES = 10 * 1024 * 1024; // 10 MB
 
 export async function POST(req: NextRequest) {
   try {
-    // On Vercel without Blob and without writable disk fallback messaging:
-    // we still write to /tmp which works for short-lived demos.
+    const ip = clientIpFromHeaders(req.headers);
+    const limited = rateLimit(`stamps:${ip}`, 8, 10 * 60 * 1000);
+    if (!limited.ok) {
+      const r = rateLimitResponse(limited.retryAfterSec);
+      return NextResponse.json(r.body, { status: r.status, headers: r.headers });
+    }
+
     if (isVercel() && !hasBlobToken()) {
-      // Allow /tmp + memory for MVP demo; warn in response meta
       console.warn(
         "BLOB_READ_WRITE_TOKEN not set — storing stamp in /tmp + memory (ephemeral on Vercel)."
       );
@@ -41,7 +54,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let parsed: { id?: string; words?: string[]; code?: string; fingers?: number; inviteToken?: string } = {};
+    let parsed: {
+      id?: string;
+      words?: string[];
+      code?: string;
+      fingers?: number;
+      inviteToken?: string;
+      sessionId?: string;
+    } = {};
     if (typeof metaField === "string") {
       parsed = JSON.parse(metaField);
     } else if (metaField instanceof Blob) {
@@ -53,15 +73,42 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const id =
-      (parsed.id && String(parsed.id).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 32)) ||
-      `${Date.now().toString(36)}`;
-    if (!id || id === "demo") {
-      return NextResponse.json(
-        { ok: false, error: "Invalid stamp id" },
-        { status: 400 }
-      );
+    const inviteToken = sanitizeInviteToken(
+      form.get("inviteToken") || parsed.inviteToken
+    );
+    const sessionIdField = form.get("sessionId") || parsed.sessionId;
+
+    let invitePaid = false;
+    if (inviteToken) {
+      const invite = await getInvite(inviteToken);
+      if (!invite) {
+        return NextResponse.json(
+          { ok: false, error: "Invite not found" },
+          { status: 404 }
+        );
+      }
+      if (invite.stampId) {
+        return NextResponse.json(
+          { ok: false, error: "This invite already has a stamp." },
+          { status: 409 }
+        );
+      }
+      invitePaid = true;
     }
+
+    if (!invitePaid) {
+      const paid = await consumeCheckoutSession(
+        sessionIdField,
+        "stamp",
+        "pending-stamp"
+      );
+      if (!paid.ok) {
+        const r = consumeErrorResponse(paid);
+        return NextResponse.json(r.body, { status: r.status });
+      }
+    }
+
+    const id = await allocateStampId();
 
     const words = Array.isArray(parsed.words)
       ? parsed.words.map(String).slice(0, 8)
@@ -88,9 +135,6 @@ export async function POST(req: NextRequest) {
 
     const saved = await saveStamp(meta, buffer, mimeType);
 
-    const inviteToken =
-      parsed.inviteToken &&
-      String(parsed.inviteToken).replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 40);
     if (inviteToken) {
       await bindInviteStamp(inviteToken, saved.id);
     }

@@ -1,11 +1,18 @@
 import type { NextConfig } from "next";
+import { securityHeaders } from "./lib/security-headers";
 
 const nextConfig: NextConfig = {
-  // Allow large video uploads in API routes (demo clips are short)
   experimental: {
     serverActions: {
       bodySizeLimit: "12mb",
     },
+  },
+  async headers() {
+    const headers = Object.entries(securityHeaders()).map(([key, value]) => ({
+      key,
+      value,
+    }));
+    return [{ source: "/:path*", headers }];
   },
 };
 

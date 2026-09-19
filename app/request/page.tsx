@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { RequestClient } from "@/components/RequestClient";
+import { paymentLinkWithRef } from "@/lib/security";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -11,10 +12,8 @@ export const metadata = {
 };
 
 export default function RequestPage() {
-  const stripePaymentLink =
-    process.env.STRIPE_PAYMENT_LINK ||
-    "https://buy.stripe.com/dRmdR89i93oGcKQ8f38og0K";
-  const devBypass = process.env.LIVEPROOF_DEV_BYPASS === "1";
+  const stripePaymentLink = paymentLinkWithRef("invite");
+  const devBypass = process.env.LIVEPROOF_DEV_BYPASS === "1" && process.env.VERCEL_ENV !== "production";
 
   return (
     <div className="flex min-h-screen flex-col">

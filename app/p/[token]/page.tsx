@@ -4,7 +4,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { CreateClient } from "@/components/CreateClient";
 import { StampView } from "@/components/StampView";
-import { getInvite, getStamp } from "@/lib/storage";
+import { getInvite, getStamp, toClientStamp } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -24,11 +24,11 @@ export default async function ProveInvitePage({ params }: Props) {
   if (invite.stampId) {
     const stamp = await getStamp(invite.stampId);
     if (stamp) {
-      let videoSrc: string | null = null;
-      if (stamp.hasVideo) {
-        videoSrc = stamp.videoUrl || `/api/stamps/${stamp.id}/video`;
-      }
-      return <StampView stamp={stamp} videoSrc={videoSrc} />;
+          let videoSrc: string | null = null;
+          if (stamp.hasVideo) {
+            videoSrc = `/api/stamps/${stamp.id}/video`;
+          }
+      return <StampView stamp={toClientStamp(stamp)} videoSrc={videoSrc} />;
     }
   }
 

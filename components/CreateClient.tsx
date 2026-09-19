@@ -31,13 +31,6 @@ function randomCode() {
   return `LIVE-${hex}`;
 }
 
-function randomId() {
-  return (
-    Math.random().toString(36).slice(2, 10) +
-    Date.now().toString(36).slice(-4)
-  );
-}
-
 function mimeType() {
   const candidates = [
     "video/webm;codecs=vp9,opus",
@@ -82,7 +75,6 @@ export function CreateClient({
 
   const [words, setWords] = useState<string[]>([]);
   const [code, setCode] = useState("LIVE-····");
-  const [stampId, setStampId] = useState("");
   const [camOn, setCamOn] = useState(false);
   const [recording, setRecording] = useState(false);
   const [blob, setBlob] = useState<Blob | null>(null);
@@ -90,6 +82,7 @@ export function CreateClient({
   const [status, setStatus] = useState("Enable your camera to begin.");
   const [statusKind, setStatusKind] = useState<"" | "ok" | "err">("");
   const [submitting, setSubmitting] = useState(false);
+  const [sessionId, setSessionId] = useState("");
   const [paid, setPaid] = useState(devBypass || !!inviteToken);
   const [fingers, setFingers] = useState(3);
 
@@ -100,7 +93,6 @@ export function CreateClient({
       setWords(pickWords(6));
     }
     setCode(randomCode());
-    setStampId(randomId());
     setFingers(1 + Math.floor(Math.random() * 5));
   }, [presetWords]);
 
@@ -116,20 +108,45 @@ export function CreateClient({
   useEffect(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
-    const paidParam = params.get("paid");
-    if (paidParam === "1" || paidParam === "true") {
+    const fromQuery = params.get("session_id") || "";
+    let stored = "";
+    try {
+      stored = sessionStorage.getItem("lp_session_id") || "";
+    } catch {
+      /* ignore */
+    }
+    const sid = fromQuery.startsWith("cs_") ? fromQuery : stored.startsWith("cs_") ? stored : "";
+    if (sid) {
       try {
-        if (sessionStorage.getItem("lp_intent") === "invite" && !inviteToken) {
-          sessionStorage.removeItem("lp_intent");
-          window.location.replace("/request?paid=1");
-          return;
-        }
+        sessionStorage.setItem("lp_session_id", sid);
       } catch {
         /* ignore */
       }
+      setSessionId(sid);
       setPaid(true);
       setStatus("Payment received. You can record and submit your stamp.");
       setStatusKind("ok");
+    }
+
+    try {
+      if (
+        sessionStorage.getItem("lp_intent") === "invite" &&
+        !inviteToken &&
+        sid
+      ) {
+        sessionStorage.removeItem("lp_intent");
+        window.location.replace(`/request?session_id=${encodeURIComponent(sid)}`);
+        return;
+      }
+    } catch {
+      /* ignore */
+    }
+
+    if (!sid && (params.get("paid") === "1" || params.get("paid") === "true")) {
+      setStatus(
+        "Checkout returned without a session id. Update the Payment Link success URL to include session_id={CHECKOUT_SESSION_ID}, then pay again. ?paid=1 is not accepted."
+      );
+      setStatusKind("err");
     }
   }, [inviteToken]);
 
@@ -244,23 +261,25 @@ export function CreateClient({
       return;
     }
     if (!paid && !devBypass && !inviteToken) {
-      setMsg("Complete payment (or enable LIVEPROOF_DEV_BYPASS) before submit.", "err");
+      setMsg("Complete payment before submit. We verify the Stripe session on the server.", "err");
       return;
     }
     setSubmitting(true);
     setMsg("Uploading stamp…");
     const fd = new FormData();
     fd.append("video", blob, "video.webm");
+    if (sessionId) fd.append("sessionId", sessionId);
+    if (inviteToken) fd.append("inviteToken", inviteToken);
     fd.append(
       "meta",
       new Blob(
         [
           JSON.stringify({
-            id: stampId,
             words,
             code,
             fingers,
             ...(inviteToken ? { inviteToken } : {}),
+            ...(sessionId ? { sessionId } : {}),
           }),
         ],
         { type: "application/json" }
@@ -273,6 +292,11 @@ export function CreateClient({
         throw new Error(data?.error || "Upload failed");
       }
       setMsg("Stamp created. Redirecting…", "ok");
+      try {
+        sessionStorage.removeItem("lp_session_id");
+      } catch {
+        /* ignore */
+      }
       router.push(data.url || (inviteToken ? `/p/${inviteToken}` : `/s/${data.id}`));
     } catch (e) {
       console.error(e);
@@ -392,11 +416,18 @@ export function CreateClient({
               Dev bypass on — payment not required.
             </p>
           ) : paid ? (
-            <p className="mb-3 text-sm text-lp-ok">Payment marked complete.</p>
+            <p className="mb-3 text-sm text-lp-ok">Payment verified — you can submit.</p>
           ) : null}
           {stripePaymentLink ? (
             <a
               href={stripePaymentLink}
+              onClick={() => {
+                try {
+                  sessionStorage.setItem("lp_intent", "stamp");
+                } catch {
+                  /* ignore */
+                }
+              }}
               className="inline-flex items-center rounded-full border border-lp-cyan/20 px-4 py-2.5 text-sm font-semibold text-lp-text hover:border-lp-cyan hover:text-lp-cyan"
             >
               Pay with Stripe

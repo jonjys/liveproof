@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { StampView } from "@/components/StampView";
-import { getStamp } from "@/lib/storage";
+import { getStamp, toClientStamp } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -22,12 +22,8 @@ export default async function StampPage({ params }: Props) {
 
   let videoSrc: string | null = null;
   if (stamp.hasVideo) {
-    if (stamp.videoUrl) {
-      videoSrc = stamp.videoUrl;
-    } else {
-      videoSrc = `/api/stamps/${stamp.id}/video`;
-    }
+    videoSrc = `/api/stamps/${stamp.id}/video`;
   }
 
-  return <StampView stamp={stamp} videoSrc={videoSrc} />;
+  return <StampView stamp={toClientStamp(stamp)} videoSrc={videoSrc} />;
 }

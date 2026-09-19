@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStamp } from "@/lib/storage";
+import { getStamp, toClientStamp } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,5 +13,8 @@ export async function GET(_req: Request, ctx: Ctx) {
     return NextResponse.json({ ok: false, error: "Not found" }, { status: 404 });
   }
   const { videoBuffer: _, ...meta } = stamp;
-  return NextResponse.json({ ok: true, stamp: meta });
+  return NextResponse.json(
+    { ok: true, stamp: toClientStamp(meta) },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }

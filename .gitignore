@@ -38,5 +38,7 @@ next-env.d.ts
 !/data/stamps/.gitkeep
 /data/invites/**
 !/data/invites/.gitkeep
+/data/entitlements/**
+!/data/entitlements/.gitkeep
 /public/uploads
 

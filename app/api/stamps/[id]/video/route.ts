@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getStamp, getVideo } from "@/lib/storage";
+import { getStamp, getVideoStream } from "@/lib/storage";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,22 +13,18 @@ export async function GET(_req: Request, ctx: Ctx) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  // Redirect to Blob URL when available
-  if (stamp.videoUrl) {
-    return NextResponse.redirect(stamp.videoUrl);
-  }
-
-  const video = await getVideo(id);
+  const video = await getVideoStream(id);
   if (!video) {
     return NextResponse.json({ error: "No video" }, { status: 404 });
   }
 
-  return new NextResponse(new Uint8Array(video.buffer), {
+  return new NextResponse(video.stream, {
     status: 200,
     headers: {
       "Content-Type": video.mimeType,
-      "Cache-Control": "public, max-age=3600",
-      "Content-Length": String(video.buffer.length),
+      "Cache-Control": "private, max-age=3600",
+      "X-Content-Type-Options": "nosniff",
+      "Content-Disposition": "inline",
     },
   });
 }
