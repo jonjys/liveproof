@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    let parsed: { id?: string; words?: string[]; code?: string } = {};
+    let parsed: { id?: string; words?: string[]; code?: string; fingers?: number } = {};
     if (typeof metaField === "string") {
       parsed = JSON.parse(metaField);
     } else if (metaField instanceof Blob) {
@@ -66,6 +66,11 @@ export async function POST(req: NextRequest) {
       ? parsed.words.map(String).slice(0, 8)
       : [];
     const code = String(parsed.code || "LIVE-0000").slice(0, 16);
+    const fingersRaw = Number(parsed.fingers);
+    const fingers =
+      Number.isFinite(fingersRaw) && fingersRaw >= 1 && fingersRaw <= 5
+        ? Math.floor(fingersRaw)
+        : undefined;
 
     const buffer = Buffer.from(await video.arrayBuffer());
     const mimeType = video.type || "video/webm";
@@ -74,6 +79,7 @@ export async function POST(req: NextRequest) {
       id,
       words,
       code,
+      fingers,
       createdAt: new Date().toISOString(),
       hasVideo: true,
       mimeType,

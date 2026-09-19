@@ -30,7 +30,7 @@ export function StampView({ stamp, videoSrc }: Props) {
         </div>
         <h1 className="mb-2 text-3xl font-bold">Verified presence</h1>
         <p className="mb-5 text-lp-muted">
-          Someone recorded this live selfie while speaking the challenge words.
+          Someone recorded this live selfie while speaking the challenge words and showing the finger count.
           Share the link — don&apos;t treat it as KYC.
         </p>
 
@@ -77,6 +77,16 @@ export function StampView({ stamp, videoSrc }: Props) {
                 {stamp.code}
               </div>
             </div>
+            {typeof stamp.fingers === "number" ? (
+              <div>
+                <div className="mb-1 text-xs uppercase tracking-wider text-lp-muted">
+                  Finger check
+                </div>
+                <div className="font-mono text-[0.98rem]">
+                  Hold up {stamp.fingers} finger{stamp.fingers === 1 ? "" : "s"}
+                </div>
+              </div>
+            ) : null}
             <div>
               <div className="mb-1 text-xs uppercase tracking-wider text-lp-muted">
                 Recorded (UTC)
