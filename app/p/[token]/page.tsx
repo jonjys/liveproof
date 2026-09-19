@@ -55,7 +55,16 @@ export default async function ProveInvitePage({ params }: Props) {
           Speak the words, hold up the fingers, max 8 seconds. Presence stamp —
           not government ID.
         </p>
-        <CreateClient inviteToken={invite.token} inviteMode devBypass={false} />
+        <CreateClient
+          inviteToken={invite.token}
+          inviteMode
+          devBypass={false}
+          presetWords={
+            invite.wordsMode === "manual" && invite.words?.length
+              ? invite.words
+              : undefined
+          }
+        />
       </main>
       <Footer note="presence, not identity" />
     </div>
