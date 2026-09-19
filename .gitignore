@@ -36,4 +36,7 @@ next-env.d.ts
 # local stamp data (videos)
 /data/stamps/**
 !/data/stamps/.gitkeep
+/data/invites/**
+!/data/invites/.gitkeep
 /public/uploads
+
