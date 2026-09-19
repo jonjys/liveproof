@@ -15,6 +15,7 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
   const [wordsMode, setWordsMode] = useState<WordsMode>("auto");
   const [wordsText, setWordsText] = useState("");
   const [paid, setPaid] = useState(devBypass);
+  const [sessionId, setSessionId] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [inviteUrl, setInviteUrl] = useState("");
@@ -33,8 +34,27 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
       /* ignore */
     }
     const params = new URLSearchParams(window.location.search);
-    const paidParam = params.get("paid");
-    if (paidParam === "1" || paidParam === "true" || devBypass) {
+    const fromQuery = params.get("session_id") || "";
+    let stored = "";
+    try {
+      stored = sessionStorage.getItem("lp_session_id") || "";
+    } catch {
+      /* ignore */
+    }
+    const sid = fromQuery.startsWith("cs_") ? fromQuery : stored.startsWith("cs_") ? stored : "";
+    if (sid) {
+      try {
+        sessionStorage.setItem("lp_session_id", sid);
+      } catch {
+        /* ignore */
+      }
+      setSessionId(sid);
+      setPaid(true);
+    } else if (params.get("paid") === "1" || params.get("paid") === "true") {
+      setError(
+        "Checkout returned without a session id. Update the Payment Link success URL to include session_id={CHECKOUT_SESSION_ID}. ?paid=1 is not accepted."
+      );
+    } else if (devBypass) {
       setPaid(true);
     }
   }, [devBypass]);
@@ -75,6 +95,7 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
           note,
           wordsMode,
           wordsText: wordsMode === "manual" ? wordsText : undefined,
+          sessionId,
         }),
       });
       const data = await res.json();
@@ -88,6 +109,7 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
       setInviteUrl(absolute);
       try {
         sessionStorage.removeItem("lp_intent");
+        sessionStorage.removeItem("lp_session_id");
       } catch {
         /* ignore */
       }
@@ -198,7 +220,7 @@ export function RequestClient({ stripePaymentLink, devBypass }: Props) {
       ) : (
         <div className="mt-6 rounded-2xl border border-lp-cyan/20 bg-gradient-to-b from-lp-card/95 to-lp-bg2/95 p-5 text-center shadow-card">
           <p className="mb-4 text-sm text-lp-ok">
-            Payment marked complete. Create your prove-you&apos;re-human link.
+            Payment verified. Create your prove-you&apos;re-human link.
           </p>
           <button
             type="button"
