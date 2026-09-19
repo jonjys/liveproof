@@ -1,2 +1,3 @@
-# liveproof
-LiveProof — shareable human presence stamps. Not KYC. Not a dating app.
+# LiveProof
+
+Shareable human presence stamps.
