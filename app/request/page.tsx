@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
 
 export const metadata = {
-  title: "Send a prove-you're-human link",
+  title: "Send a proof link",
 };
 
 export default function RequestPage() {
@@ -30,15 +30,15 @@ export default function RequestPage() {
       <main className="mx-auto w-full max-w-[640px] flex-1 px-4 py-8 pb-16">
         <div className="mb-3">
           <span className="inline-block rounded-full border border-lp-cyan/35 bg-lp-cyan/10 px-3 py-1 text-xs font-semibold text-lp-cyan">
-            Presence stamp — not government ID
+            Presence stamp, not government ID
           </span>
         </div>
         <h1 className="mb-2 text-[1.85rem] font-bold">
-          Send a prove-you&apos;re-human link
+          Send a proof link
         </h1>
         <p className="text-lp-muted">
           Pay once, share a private link. They land straight on the camera
-          challenge — no marketing page. When they submit, you both see the
+          challenge, no marketing page. When they submit, you both see the
           stamp on the same URL.
         </p>
         <RequestClient

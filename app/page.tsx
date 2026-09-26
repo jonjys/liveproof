@@ -9,21 +9,21 @@ export default function HomePage() {
       <main className="mx-auto w-full max-w-[980px] flex-1 px-4 py-8 pb-16">
         <section className="py-14 text-left">
           <h1 className="mb-4 text-[clamp(2.2rem,5vw,3.4rem)] font-bold leading-[1.08] tracking-tight">
-            Prove you are a <span className="text-gradient">real human</span> —{" "}
-            in 8 seconds.
+            Is this person <span className="text-gradient">real</span>?{" "}
+            Find out in 8 seconds.
           </h1>
           <p className="mb-7 max-w-xl text-lg text-lp-muted">
-            Hiring, freelance, marketplaces, housing — and dating. When you need
-            to trust that someone is a real person before you invest time, send a
-            LiveProof link. Paid presence stamp: live selfie challenge, shareable
-            URL. Not KYC. Not a PDF. Not government ID.
+            Selling on Blocket or Marketplace, meeting a date, hiring someone
+            remote. Send one link. They say six random words on camera and hold
+            up fingers. You both see the clip on a stamped page. No app, no
+            account, no ID upload. One link costs 49 kr.
           </p>
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/request"
               className="inline-flex items-center rounded-full bg-gradient-to-br from-lp-cyan to-lp-cyan2 px-5 py-2.5 font-semibold text-[#042026] shadow-glow"
             >
-              Send a prove-you&apos;re-human link
+              Send a proof link
             </Link>
             <Link
               href="/create"
@@ -46,7 +46,7 @@ export default function HomePage() {
             },
             {
               title: "Freelance & marketplaces",
-              body: "Gigs, housing, and peer-to-peer deals — confirm presence before you wire money or hand over keys.",
+              body: "Buying, renting or selling to a stranger? Check they are a live person before you pay, ship or hand over keys.",
             },
             {
               title: "Dating & messaging",
@@ -75,8 +75,8 @@ export default function HomePage() {
               d: "Front camera selfie. Say the words and show your fingers. We never ask for passport or SSN.",
             },
             {
-              t: "Share the stamp — or send an invite",
-              d: "Public page with video, challenge, ISO timestamp. Or pay once and send a prove-you&apos;re-human link.",
+              t: "Share the stamp or send an invite",
+              d: "Public page with video, challenge and timestamp. Or pay once and send someone a proof link.",
             },
           ].map((s, i) => (
             <li
@@ -100,7 +100,7 @@ export default function HomePage() {
               Ready to stamp presence?
             </h2>
             <p className="mt-1.5 text-lp-muted">
-              Presence stamp — not government ID. Ask someone to prove they are
+              Presence stamp, not government ID. Ask someone to prove they are
               real, or get your own stamp.
             </p>
           </div>
@@ -109,7 +109,7 @@ export default function HomePage() {
               href="/request"
               className="inline-flex items-center rounded-full bg-gradient-to-br from-lp-cyan to-lp-cyan2 px-5 py-2.5 font-semibold text-[#042026] shadow-glow"
             >
-              Send a prove-you&apos;re-human link
+              Send a proof link
             </Link>
             <Link
               href="/create"

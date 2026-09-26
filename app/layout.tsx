@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://liveproof.nyttolabs.com"),
   title: {
-    default: "LiveProof — prove you are a real human",
+    default: "LiveProof · is this person real?",
     template: "%s · LiveProof",
   },
   description:
