@@ -4,11 +4,11 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://liveproof.nyttolabs.com"),
   title: {
-    default: "LiveProof · is this person real?",
+    default: "LiveProof · check before you trust",
     template: "%s · LiveProof",
   },
   description:
-    "Paid shareable presence stamp. Record a live selfie challenge. Not KYC. Not a dating app.",
+    "Person stamp + message scam check. Prove someone is live, or scan an inbound job/client email before you start. $5 / 49:-. No account.",
 };
 
 export default function RootLayout({

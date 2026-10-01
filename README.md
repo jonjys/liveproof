@@ -1,8 +1,13 @@
 # LiveProof (web)
 
-Paid shareable **presence stamp** — prove you are a real human for dating chats, remote jobs, and applications.
+**Check before you trust** — two paid tools, one brand:
 
-Not a dating app. Not KYC. Not a PDF.
+1. **Person stamp** — prove you are a real human (live selfie challenge)
+2. **Message check** — paste an inbound job/client email, get a go/no-go risk report
+
+Not a dating app. Not KYC. Not a freelance CRM. No account. **$5 / 49:-** per paid check.
+
+**Live:** [liveproof.nyttolabs.com](https://liveproof.nyttolabs.com) · message check also at [clientproof.nyttolabs.com](https://clientproof.nyttolabs.com) → `/check`
 
 **Brand:** LiveProof only.
 
@@ -20,7 +25,9 @@ Not a dating app. Not KYC. Not a PDF.
 
 | Route | Purpose |
 |-------|---------|
-| `/` | Landing — sells the pain |
+| `/` | Landing — person stamp + message check |
+| `/check` | Message scam check (paste inbound text) |
+| `/check/r/[id]` | Risk report (+ Stripe unlock for sealed details) |
 | `/create` | Challenge + selfie record + upload (requires paid Checkout Session) |
 | `/request` | Pay once, mint an invite link |
 | `/paid` | Stripe return URL (`?session_id={CHECKOUT_SESSION_ID}`) |

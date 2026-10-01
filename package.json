@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test --test-concurrency=1 lib/*.test.ts",
+    "test": "tsx --test --test-concurrency=1 lib/*.test.ts lib/check/*.test.ts",
     "purge-audit": "tsx scripts/purge-audit.ts"
   },
   "dependencies": {

@@ -19,10 +19,10 @@ export function Header({ right }: Props) {
         {right ?? (
           <>
             <Link
-              href="/s/demo"
+              href="/check"
               className="inline-flex items-center rounded-full border border-lp-cyan/20 px-3.5 py-1.5 text-sm font-semibold text-lp-text transition hover:border-lp-cyan hover:text-lp-cyan"
             >
-              See demo
+              Message check
             </Link>
             <Link
               href="/create"
