@@ -27,21 +27,29 @@ export async function POST(request: Request) {
     );
   }
 
-  const analyzed = analyzeInbound({
-    sourceText,
-    companyName: body.companyName,
-    contact: body.contact,
-  });
+  try {
+    const analyzed = analyzeInbound({
+      sourceText,
+      companyName: body.companyName,
+      contact: body.contact,
+    });
 
-  const report: CheckReport = {
-    id: newCheckId(),
-    createdAt: new Date().toISOString(),
-    unlocked: false,
-    paidAt: null,
-    stripeSessionId: null,
-    ...analyzed,
-  };
+    const report: CheckReport = {
+      id: newCheckId(),
+      createdAt: new Date().toISOString(),
+      unlocked: false,
+      paidAt: null,
+      stripeSessionId: null,
+      ...analyzed,
+    };
 
-  await saveReport(report);
-  return NextResponse.json({ report: toPublicReport(report) });
+    await saveReport(report);
+    return NextResponse.json({ report: toPublicReport(report) });
+  } catch (err) {
+    console.error("checks POST failed:", err);
+    return NextResponse.json(
+      { error: "Could not save the check. Try again." },
+      { status: 500 }
+    );
+  }
 }
