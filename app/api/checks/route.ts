@@ -3,10 +3,23 @@ import { analyzeInbound } from "@/lib/check/analyze";
 import { newCheckId, saveReport } from "@/lib/check/store";
 import { toPublicReport } from "@/lib/check/public-report";
 import type { CheckReport } from "@/lib/check/types";
+import { clientIpFromHeaders, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const ip = clientIpFromHeaders(request.headers);
+  const limited = rateLimit(`checks:${ip}`, 30, 60_000);
+  if (!limited.ok) {
+    return NextResponse.json(
+      { error: "Too many checks. Try again in a minute." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(limited.retryAfterSec) },
+      }
+    );
+  }
+
   const body = (await request.json().catch(() => ({}))) as {
     sourceText?: string;
     companyName?: string;

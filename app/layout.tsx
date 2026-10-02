@@ -8,7 +8,7 @@ export const metadata: Metadata = {
     template: "%s · LiveProof",
   },
   description:
-    "Person stamp + message scam check. Prove someone is live, or scan an inbound job/client email before you start. $5 / 49:-. No account.",
+    "Person stamp + message scam check. Prove someone is live, or scan an inbound job/client email before you start. Free score, sealed report $5 / 49:-. No account.",
 };
 
 export default function RootLayout({

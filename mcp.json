@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "liveproof": {
+      "url": "https://liveproof.nyttolabs.com/api/mcp"
+    }
+  }
+}

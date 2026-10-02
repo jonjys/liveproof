@@ -1,0 +1,24 @@
+{
+  "name": "liveproof",
+  "version": "1.1.0",
+  "description": "Check inbound freelance/job messages for scam patterns before you reply. LiveProof message check via MCP.",
+  "author": {
+    "name": "Nytto Labs",
+    "email": "fkornelind@nyttolabs.com"
+  },
+  "homepage": "https://liveproof.nyttolabs.com/check",
+  "repository": "https://github.com/jonjys/liveproof",
+  "license": "MIT",
+  "keywords": [
+    "scam-check",
+    "freelance",
+    "liveproof",
+    "mcp",
+    "risk"
+  ],
+  "mcpServers": "mcp.json",
+  "variables": {
+    "type": "object",
+    "properties": {}
+  }
+}

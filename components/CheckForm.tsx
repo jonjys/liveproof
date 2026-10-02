@@ -3,14 +3,24 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { REPORT_PRICE_LABEL } from "@/lib/check/types";
+import { SAMPLE_MESSAGES } from "@/lib/check/samples";
 
-export function CheckForm() {
+export function CheckForm({ autoFocus = false }: { autoFocus?: boolean }) {
   const router = useRouter();
   const [sourceText, setSourceText] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [contact, setContact] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+
+  function applySample(id: string) {
+    const sample = SAMPLE_MESSAGES.find((s) => s.id === id);
+    if (!sample) return;
+    setSourceText(sample.sourceText);
+    setCompanyName(sample.companyName);
+    setContact(sample.contact);
+    setError(null);
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,13 +50,29 @@ export function CheckForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
+      <div className="flex flex-wrap gap-2">
+        {SAMPLE_MESSAGES.map((sample) => (
+          <button
+            key={sample.id}
+            type="button"
+            onClick={() => applySample(sample.id)}
+            className="rounded-full border border-lp-cyan/25 bg-lp-bg2/60 px-3 py-1 text-xs font-semibold text-lp-muted transition hover:border-lp-cyan hover:text-lp-cyan"
+          >
+            Try: {sample.label}
+          </button>
+        ))}
+      </div>
       <div>
-        <label htmlFor="source" className="mb-1.5 block text-sm font-medium text-lp-text">
+        <label
+          htmlFor="source"
+          className="mb-1.5 block text-sm font-medium text-lp-text"
+        >
           Paste the inbound message
         </label>
         <textarea
           id="source"
           required
+          autoFocus={autoFocus}
           value={sourceText}
           onChange={(e) => setSourceText(e.target.value)}
           placeholder="Dear Freelancer, we found your profile… paste the email, LinkedIn DM, Upwork invite, or Slack dump here."
@@ -55,7 +81,10 @@ export function CheckForm() {
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
-          <label htmlFor="company" className="mb-1.5 block text-sm font-medium text-lp-text">
+          <label
+            htmlFor="company"
+            className="mb-1.5 block text-sm font-medium text-lp-text"
+          >
             Company name (optional)
           </label>
           <input
@@ -67,7 +96,10 @@ export function CheckForm() {
           />
         </div>
         <div>
-          <label htmlFor="contact" className="mb-1.5 block text-sm font-medium text-lp-text">
+          <label
+            htmlFor="contact"
+            className="mb-1.5 block text-sm font-medium text-lp-text"
+          >
             Their email / handle (optional)
           </label>
           <input

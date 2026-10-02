@@ -24,3 +24,12 @@ test("clean brief stays low/medium", () => {
   assert.ok(report.score < 45);
   assert.ok(report.level === "low" || report.level === "medium");
 });
+
+test("flags package-mule assistant script", () => {
+  const report = analyzeInbound({
+    sourceText:
+      "We need a remote personal assistant to receive packages and forward money for our overseas office. Urgent start this week.",
+  });
+  assert.ok(report.flags.some((f) => f.id === "remote-assistant-kit"));
+  assert.ok(report.score >= 22);
+});

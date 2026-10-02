@@ -164,6 +164,68 @@ const RULES: Array<{
         text
       ),
   },
+  {
+    id: "hiring-manager-no-domain",
+    severity: "warn",
+    weight: 12,
+    title: "Claims hiring role without company domain",
+    detail:
+      "“HR / Hiring Manager” titles paired with free email addresses are a common script.",
+    test: ({ text, contact }) =>
+      /(hiring\s+manager|hr\s+manager|talent\s+acquisition|rekryterare)/i.test(
+        text
+      ) &&
+      (/(gmail|hotmail|yahoo|outlook)\.com/i.test(contact) ||
+        /(gmail|hotmail|yahoo)\.com/i.test(text)),
+  },
+  {
+    id: "wire-transfer-only",
+    severity: "warn",
+    weight: 13,
+    title: "Insists on wire / Western Union only",
+    detail:
+      "Pushing irreversible rails before any deliverable is a classic fraud tell.",
+    test: ({ text }) =>
+      /(western\s*union|moneygram|wire\s+transfer\s+only|bank\s+transfer\s+only|endast\s+swish)/i.test(
+        text
+      ),
+  },
+  {
+    id: "romance-adjacent-job",
+    severity: "warn",
+    weight: 11,
+    title: "Personal / romantic tone in a “job” pitch",
+    detail:
+      "Overly personal compliments mixed into hiring outreach often precedes romance or advance-fee scams.",
+    test: ({ text }) =>
+      /(you\s+seem\s+like\s+a\s+kind|looking\s+for\s+someone\s+trustworthy|god\s+bless|my\s+late\s+(husband|wife))/i.test(
+        text
+      ),
+  },
+  {
+    id: "ndas-before-details",
+    severity: "info",
+    weight: 7,
+    title: "NDA / secrecy before any project detail",
+    detail:
+      "Asking you to sign an NDA or keep everything secret before explaining the job can be pressure theater.",
+    test: ({ text }) =>
+      /(sign\s+(an?\s+)?nda|non[- ]disclosure).{0,40}(before|first|först)|hemlig.{0,30}(innan|före)/i.test(
+        text
+      ),
+  },
+  {
+    id: "remote-assistant-kit",
+    severity: "danger",
+    weight: 26,
+    title: "Remote assistant / package reship kit",
+    detail:
+      "“Personal assistant” roles that ask you to receive packages or move money are mule-recruitment scripts.",
+    test: ({ text }) =>
+      /(personal\s+assistant|remote\s+assistant).{0,80}(package|parcel|reship|receive\s+funds|forward\s+money)|paketombud|mottagare\s+av\s+paket/i.test(
+        text
+      ),
+  },
 ]
 
 function levelForScore(score: number): RiskLevel {

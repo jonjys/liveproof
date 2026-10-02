@@ -11,6 +11,16 @@ Not a dating app. Not KYC. Not a freelance CRM. No account. **$5 / 49:-** per pa
 
 **Brand:** LiveProof only.
 
+### Cursor plugin / MCP
+
+Packaged as a Cursor plugin (message check tools):
+
+- [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json)
+- [`mcp.json`](mcp.json) → `https://liveproof.nyttolabs.com/api/mcp`
+- Tools: `check_inbound_message`, `get_message_check`
+
+The old **Scoped** Marketplace plugin is **not** auto-updated — it pointed at a product we killed. Use this LiveProof repo / MCP instead (re-submit or add MCP manually).
+
 ## Stack
 
 - Next.js App Router + TypeScript + Tailwind CSS
@@ -26,8 +36,9 @@ Not a dating app. Not KYC. Not a freelance CRM. No account. **$5 / 49:-** per pa
 | Route | Purpose |
 |-------|---------|
 | `/` | Landing — person stamp + message check |
-| `/check` | Message scam check (paste inbound text) |
+| `/check` | Message scam check (paste inbound text + sample scams) |
 | `/check/r/[id]` | Risk report (+ Stripe unlock for sealed details) |
+| `/api/mcp` | Cursor MCP for message checks |
 | `/create` | Challenge + selfie record + upload (requires paid Checkout Session) |
 | `/request` | Pay once, mint an invite link |
 | `/paid` | Stripe return URL (`?session_id={CHECKOUT_SESSION_ID}`) |
