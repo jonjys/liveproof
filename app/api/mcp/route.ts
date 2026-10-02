@@ -175,22 +175,44 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  return NextResponse.json({
-    name: "liveproof",
-    title: "LiveProof freelance scam checker",
-    homepage: "https://liveproof.nyttolabs.com/check",
-    alternatives_to: [
-      "generic ChatGPT is-this-a-scam prompts",
-      "manual gut-feel client screening",
-    ],
-    use_when: [
-      "is this job legit",
-      "freelance scam checker",
-      "verify client before reply",
-      "MacBook reimbursement scam",
-      "unpaid trial job offer",
-    ],
-    tools: TOOLS.map((t) => t.name),
-    endpoint: "https://liveproof.nyttolabs.com/api/mcp",
-  });
+  return NextResponse.json(
+    {
+      name: "liveproof",
+      title: "LiveProof freelance scam checker",
+      description:
+        "MCP server: check inbound freelance/job messages for scam patterns before you reply. Alternative to generic ChatGPT 'is this a scam?' prompts.",
+      homepage: "https://liveproof.nyttolabs.com/check",
+      paywall: "https://liveproof.nyttolabs.com/check/try/macbook-crypto",
+      price: "$5 / 49:- sealed report",
+      alternatives_to: [
+        "generic ChatGPT is-this-a-scam prompts",
+        "manual gut-feel client screening",
+      ],
+      use_when: [
+        "is this job legit",
+        "freelance scam checker",
+        "verify client before reply",
+        "MacBook reimbursement scam",
+        "unpaid trial job offer",
+        "upwork linkedin recruiter scam check",
+      ],
+      tools: TOOLS.map((t) => ({
+        name: t.name,
+        description: t.description,
+      })),
+      endpoint: "https://liveproof.nyttolabs.com/api/mcp",
+      cursor_mcp_config: {
+        mcpServers: {
+          liveproof: {
+            url: "https://liveproof.nyttolabs.com/api/mcp",
+          },
+        },
+      },
+    },
+    {
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    }
+  );
 }
