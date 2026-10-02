@@ -61,6 +61,15 @@ export default function CheckPage() {
               <li>· No account</li>
               <li>· Works on LinkedIn / Upwork / email dumps</li>
               <li>· Swedish + English patterns</li>
+              <li>
+                · Shareable demo:{" "}
+                <a
+                  className="text-lp-cyan hover:underline"
+                  href="/check/try/macbook-crypto"
+                >
+                  /check/try/macbook-crypto
+                </a>
+              </li>
             </ul>
           </div>
           <div

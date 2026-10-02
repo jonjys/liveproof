@@ -58,9 +58,15 @@ export function CheckForm({ autoFocus = false }: { autoFocus?: boolean }) {
             onClick={() => applySample(sample.id)}
             className="rounded-full border border-lp-cyan/25 bg-lp-bg2/60 px-3 py-1 text-xs font-semibold text-lp-muted transition hover:border-lp-cyan hover:text-lp-cyan"
           >
-            Try: {sample.label}
+            Fill: {sample.label}
           </button>
         ))}
+        <a
+          href="/check/try/macbook-crypto"
+          className="rounded-full border border-lp-danger/40 bg-lp-danger/10 px-3 py-1 text-xs font-semibold text-lp-danger transition hover:border-lp-danger"
+        >
+          Instant demo → paywall
+        </a>
       </div>
       <div>
         <label

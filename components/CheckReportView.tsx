@@ -25,11 +25,13 @@ export function CheckReportView({
   paid,
   sessionId,
   mock,
+  fromTry,
 }: {
   initial: PublicReport;
   paid?: boolean;
   sessionId?: string;
   mock?: boolean;
+  fromTry?: boolean;
 }) {
   const router = useRouter();
   const [report, setReport] = useState(initial);
@@ -117,9 +119,18 @@ export function CheckReportView({
   }
 
   const scorePct = Math.max(4, Math.min(100, report.score));
+  const needsPay = !report.unlocked;
+  const hot =
+    report.level === "critical" || report.level === "high" || report.score >= 45;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-28 sm:pb-8">
+      {fromTry && needsPay ? (
+        <p className="rounded-xl border border-lp-cyan/25 bg-lp-cyan/10 px-4 py-2 text-sm text-lp-cyan">
+          Demo scan ready — unlock the sealed report to see the full playbook.
+        </p>
+      ) : null}
+
       <div className="animate-rise">
         <p className="mb-2 text-xs font-semibold tracking-[0.18em] text-lp-cyan uppercase">
           Message check
@@ -192,7 +203,7 @@ export function CheckReportView({
         {!report.unlocked && report.hiddenFlagCount > 0 ? (
           <p className="text-sm text-lp-muted">
             +{report.hiddenFlagCount} more flag
-            {report.hiddenFlagCount === 1 ? "" : "s"} sealed in the full report.
+            {report.hiddenFlagCount === 1 ? "" : "s"} sealed below.
           </p>
         ) : null}
       </section>
@@ -226,7 +237,9 @@ export function CheckReportView({
           ) : null}
           {(report.level === "high" || report.level === "critical") && (
             <section className="rounded-2xl border border-lp-cyan/20 bg-lp-card/40 p-5">
-              <h2 className="text-lg font-semibold">Still unsure who they are?</h2>
+              <h2 className="text-lg font-semibold">
+                Still unsure who they are?
+              </h2>
               <p className="mt-1 text-sm text-lp-muted">
                 Ask for a LiveProof person stamp before you schedule a call.
               </p>
@@ -240,25 +253,50 @@ export function CheckReportView({
           )}
         </>
       ) : (
-        <section className="space-y-4 rounded-2xl border border-lp-cyan/20 bg-gradient-to-br from-lp-cyan/10 to-lp-cyan2/5 p-6">
-          <h2 className="text-xl font-semibold">Unlock sealed report</h2>
+        <section
+          id="unlock"
+          className={`space-y-4 rounded-2xl border p-6 ${
+            hot
+              ? "border-lp-danger/40 bg-gradient-to-br from-lp-danger/15 to-lp-cyan2/5"
+              : "border-lp-cyan/20 bg-gradient-to-br from-lp-cyan/10 to-lp-cyan2/5"
+          }`}
+        >
+          <h2 className="text-xl font-semibold">
+            {hot
+              ? "This looks dangerous — unlock the playbook"
+              : "Unlock sealed report"}
+          </h2>
           <p className="text-lp-muted">
-            Every flag explained, a clear go/no-go action list, and a reply
-            script. One payment. No account.
+            Free score is the warning light. The sealed report is what you send
+            back — or walk away with. One payment. No account.
           </p>
+          <ul className="space-y-2 text-sm text-lp-muted">
+            {(report.sealedPreview || []).map((item) => (
+              <li
+                key={item}
+                className="flex gap-2 rounded-lg border border-lp-cyan/15 bg-lp-bg/40 px-3 py-2"
+              >
+                <span className="text-lp-cyan">✓</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
           <p className="text-3xl font-bold">{REPORT_PRICE_LABEL}</p>
           <button
             type="button"
             onClick={unlock}
             disabled={pending || confirming}
-            className="inline-flex items-center rounded-full bg-gradient-to-br from-lp-cyan to-lp-cyan2 px-5 py-2.5 font-semibold text-[#042026] shadow-glow disabled:opacity-60"
+            className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-br from-lp-cyan to-lp-cyan2 px-5 py-3 font-semibold text-[#042026] shadow-glow disabled:opacity-60 sm:w-auto"
           >
             {confirming
               ? "Confirming payment…"
               : pending
-                ? "Redirecting…"
-                : `Unlock full report — ${REPORT_PRICE_LABEL}`}
+                ? "Opening Stripe…"
+                : `Unlock now — ${REPORT_PRICE_LABEL}`}
           </button>
+          <p className="text-xs text-lp-muted">
+            Card / Klarna / Link · Instant unlock after payment
+          </p>
           {error ? (
             <p className="text-sm text-lp-danger" role="alert">
               {error}
@@ -266,6 +304,19 @@ export function CheckReportView({
           ) : null}
         </section>
       )}
+
+      {needsPay ? (
+        <div className="fixed inset-x-0 bottom-0 z-50 border-t border-lp-cyan/20 bg-lp-bg/95 p-3 backdrop-blur-md sm:hidden">
+          <button
+            type="button"
+            onClick={unlock}
+            disabled={pending || confirming}
+            className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-br from-lp-cyan to-lp-cyan2 px-5 py-3 font-semibold text-[#042026] shadow-glow disabled:opacity-60"
+          >
+            {pending ? "Opening Stripe…" : `Unlock — ${REPORT_PRICE_LABEL}`}
+          </button>
+        </div>
+      ) : null}
     </div>
   );
 }

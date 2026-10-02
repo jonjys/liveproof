@@ -1,7 +1,7 @@
 {
   "name": "liveproof",
-  "version": "1.1.0",
-  "description": "Check inbound freelance/job messages for scam patterns before you reply. LiveProof message check via MCP.",
+  "version": "1.2.0",
+  "description": "Freelance scam checker + client verification for Cursor. Paste an inbound job offer, hiring email, Upwork invite, or LinkedIn DM — detect MacBook reimbursement scams, unpaid trials, crypto payouts, Telegram-only pressure, and advance-fee scripts before you reply. Alternative to guessing, ChatGPT one-offs, or generic 'is this a scam' prompts. Also: LiveProof person stamp for prove-you're-human links.",
   "author": {
     "name": "Nytto Labs",
     "email": "fkornelind@nyttolabs.com"
@@ -10,13 +10,30 @@
   "repository": "https://github.com/jonjys/liveproof",
   "license": "MIT",
   "keywords": [
-    "scam-check",
-    "freelance",
+    "freelance-scam-checker",
+    "job-offer-scam",
+    "is-this-job-legit",
+    "client-verification",
+    "hiring-email-check",
+    "upwork-scam",
+    "linkedin-recruiter-scam",
+    "macbook-reimbursement-scam",
+    "unpaid-trial-scam",
+    "advance-fee-scam",
+    "crypto-payment-scam",
+    "telegram-job-scam",
+    "scam-detector",
+    "go-no-go",
+    "risk-report",
     "liveproof",
     "mcp",
-    "risk"
+    "alternative-to-chatgpt-scam-check",
+    "verify-client-before-reply",
+    "freelance-safety"
   ],
+  "logo": "assets/marketplace-logo.svg",
   "mcpServers": "mcp.json",
+  "skills": "skills/",
   "variables": {
     "type": "object",
     "properties": {}

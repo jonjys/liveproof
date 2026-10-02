@@ -121,10 +121,10 @@ export default function HomePage() {
                 Paste a message
               </Link>
               <Link
-                href="/check#samples"
+                href="/check/try/macbook-crypto"
                 className="inline-flex items-center rounded-full border border-lp-cyan/20 px-4 py-2 text-sm font-semibold text-lp-text hover:border-lp-cyan hover:text-lp-cyan"
               >
-                Try a sample scam
+                Instant demo → unlock
               </Link>
             </div>
           </article>

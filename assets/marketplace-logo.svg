@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="LiveProof">
+  <rect width="128" height="128" rx="28" fill="#050b0e"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#22d3ee"/>
+      <stop offset="100%" stop-color="#06b6d4"/>
+    </linearGradient>
+  </defs>
+  <circle cx="64" cy="64" r="40" fill="none" stroke="url(#g)" stroke-width="6"/>
+  <circle cx="64" cy="64" r="14" fill="url(#g)"/>
+  <path d="M64 18v14M64 96v14M18 64h14M96 64h14" stroke="url(#g)" stroke-width="5" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /check
+Allow: /freelance-scam-check
+Allow: /api/mcp
+Disallow: /check/r/
+Disallow: /api/checks/
+
+Sitemap: https://liveproof.nyttolabs.com/sitemap.xml

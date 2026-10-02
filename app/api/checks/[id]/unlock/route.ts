@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/stripe";
 import { toPublicReport } from "@/lib/check/public-report";
 import {
   REPORT_CURRENCY,
+  REPORT_PRICE_LABEL,
   REPORT_PRICE_ORE,
 } from "@/lib/check/types";
 
@@ -31,8 +32,10 @@ export async function POST(
   if (stripe && !bypass) {
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+      locale: "auto",
+      submit_type: "pay",
       success_url: `${origin}/check/r/${id}?paid=1&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/check/r/${id}?canceled=1`,
+      cancel_url: `${origin}/check/r/${id}?canceled=1#unlock`,
       line_items: [
         {
           quantity: 1,
@@ -40,15 +43,19 @@ export async function POST(
             currency: REPORT_CURRENCY,
             unit_amount: REPORT_PRICE_ORE,
             product_data: {
-              name: "LiveProof message check — sealed report",
-              description: `Full go/no-go report ${id}`,
+              name: `LiveProof sealed report (${REPORT_PRICE_LABEL})`,
+              description:
+                "Full scam flags, go/no-go actions, and copy-paste reply for this inbound message.",
             },
           },
         },
       ],
       metadata: {
         kind: "message_check",
+        product: "liveproof_message_check",
         reportId: id,
+        level: report.level,
+        score: String(report.score),
       },
     });
     return NextResponse.json({ url: session.url, mode: "stripe" });

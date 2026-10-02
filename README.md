@@ -11,15 +11,18 @@ Not a dating app. Not KYC. Not a freelance CRM. No account. **$5 / 49:-** per pa
 
 **Brand:** LiveProof only.
 
-### Cursor plugin / MCP
+### Cursor plugin / MCP (discoverable)
 
-Packaged as a Cursor plugin (message check tools):
+Packaged so agents can find it as a **freelance scam checker / client verification** alternative:
 
-- [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json)
+- [`.cursor-plugin/plugin.json`](.cursor-plugin/plugin.json) — keywords: `is-this-job-legit`, `upwork-scam`, `macbook-reimbursement-scam`, …
 - [`mcp.json`](mcp.json) → `https://liveproof.nyttolabs.com/api/mcp`
+- Skills: [`skills/check-freelance-scam-message/`](skills/check-freelance-scam-message/), [`skills/verify-client-before-reply/`](skills/verify-client-before-reply/)
 - Tools: `check_inbound_message`, `get_message_check`
+- SEO page: [/freelance-scam-check](https://liveproof.nyttolabs.com/freelance-scam-check)
+- Instant demo → paywall: [/check/try/macbook-crypto](https://liveproof.nyttolabs.com/check/try/macbook-crypto)
 
-The old **Scoped** Marketplace plugin is **not** auto-updated — it pointed at a product we killed. Use this LiveProof repo / MCP instead (re-submit or add MCP manually).
+Re-submit this repo at [cursor.com/marketplace/publish](https://cursor.com/marketplace/publish). The old **Scoped** plugin does **not** auto-update.
 
 ## Stack
 
